@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ ivory-shield",
+    "deploy": "graph deploy --studio ivory-shield",
     "create-local": "graph create --node http://localhost:8020/ ivory-shield",
     "remove-local": "graph remove --node http://localhost:8020/ ivory-shield",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ivory-shield",
@@ -14,5 +14,7 @@
     "@graphprotocol/graph-cli": "0.71.0",
     "@graphprotocol/graph-ts": "0.32.0"
   },
-  "devDependencies": { "matchstick-as": "0.5.0" }
+  "devDependencies": {
+    "matchstick-as": "0.5.0"
+  }
 }

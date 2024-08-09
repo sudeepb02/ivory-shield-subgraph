@@ -1,32 +1,21 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
-  AdminChanged as AdminChangedEvent,
-  Upgraded as UpgradedEvent
-} from "../generated/EAS/EAS"
-import { AdminChanged, Upgraded } from "../generated/schema"
+  Attested as AttestedEvent,
+  Revoked as RevokedEvent,
+} from "../generated/EAS/EAS";
+import { AttestationRequestData } from "../generated/schema";
 
-export function handleAdminChanged(event: AdminChangedEvent): void {
-  let entity = new AdminChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.previousAdmin = event.params.previousAdmin
-  entity.newAdmin = event.params.newAdmin
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+export function handleAttested(event: AttestedEvent): void {
+  let attestation = AttestationRequestData.load(event.params.uid);
+  if (!attestation) {
+    attestation = new AttestationRequestData(event.params.uid);
+    attestation.recipient = event.params.recipient;
+    attestation.expirationTime = event.block.timestamp;
+    attestation.revocable = true;
+    attestation.refUID = Bytes.empty();
+    attestation.data = event.params.schemaUID;
+    attestation.value = BigInt.zero();
+    attestation.save();
+  }
 }
-
-export function handleUpgraded(event: UpgradedEvent): void {
-  let entity = new Upgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.implementation = event.params.implementation
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
+export function handleRevoked(event: RevokedEvent): void {}

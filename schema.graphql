@@ -1,32 +1,36 @@
-type AdminChanged @entity(immutable: true) {
+type SchemaRecord @entity {
+  " // The unique identifier of the schema. "
   id: Bytes!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+
+  " // Optional schema resolver. "
+  resolver: Bytes!
+
+  " Whether the schema allows revocations explicitly. "
+  revocable: Boolean!
+
+  " // Custom specification of the schema (e.g., an ABI). "
+  schema: String!
 }
 
-type Upgraded @entity(immutable: true) {
+type AttestationRequestData @entity {
+  " Unique ID of the Attestation "
   id: Bytes!
-  implementation: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-type SchemaRegistryAdminChanged @entity(immutable: true) {
-  id: Bytes!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
 
-type SchemaRegistryUpgraded @entity(immutable: true) {
-  id: Bytes!
-  implementation: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  "// The recipient of the attestation. "
+  recipient: Bytes!
+
+  "// The time when the attestation expires (Unix timestamp). "
+  expirationTime: BigInt!
+
+  " // Whether the attestation is revocable. "
+  revocable: Boolean!
+
+  "// The UID of the related attestation. "
+  refUID: Bytes!
+
+  "// Custom attestation data. "
+  data: Bytes!
+
+  "// An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors. "
+  value: BigInt!
 }

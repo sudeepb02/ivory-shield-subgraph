@@ -1,32 +1,13 @@
-import {
-  AdminChanged as AdminChangedEvent,
-  Upgraded as UpgradedEvent,
-} from "../generated/SchemaRegistry/SchemaRegistry"
-import { AdminChanged, Upgraded } from "../generated/schema"
+import { SchemaRecord } from "../generated/schema";
+import { Registered as RegisteredEvent } from "../generated/SchemaRegistry/SchemaRegistry";
 
-export function handleAdminChanged(event: AdminChangedEvent): void {
-  let entity = new AdminChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.previousAdmin = event.params.previousAdmin
-  entity.newAdmin = event.params.newAdmin
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleUpgraded(event: UpgradedEvent): void {
-  let entity = new Upgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.implementation = event.params.implementation
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+export function handleRegistered(event: RegisteredEvent): void {
+  let schemaRecord = SchemaRecord.load(event.params.schema.uid);
+  if (!schemaRecord) {
+    schemaRecord = new SchemaRecord(event.params.schema.uid);
+    schemaRecord.resolver = event.params.schema.resolver;
+    schemaRecord.revocable = event.params.schema.revocable;
+    schemaRecord.schema = event.params.schema.schema;
+    schemaRecord.save();
+  }
 }

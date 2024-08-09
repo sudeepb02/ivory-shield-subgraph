@@ -22,10 +22,10 @@ dataSources:
         - name: EAS
           file: ./abis/EAS.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+        - event: Attested(indexed address,indexed address,bytes32,indexed bytes32)
+          handler: handleAttested
+        - event: Revoked(indexed address,indexed address,bytes32,indexed bytes32)
+          handler: handleRevoked
       file: ./src/eas.ts
   - kind: ethereum
     name: SchemaRegistry
@@ -45,8 +45,6 @@ dataSources:
         - name: SchemaRegistry
           file: ./abis/SchemaRegistry.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
+        - event: Registered(indexed bytes32,indexed address,(bytes32,address,bool,string))
+          handler: handleRegistered
       file: ./src/schema-registry.ts
