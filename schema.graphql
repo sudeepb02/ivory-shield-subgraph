@@ -12,25 +12,54 @@ type SchemaRecord @entity {
   schema: String!
 }
 
-type AttestationRequestData @entity {
+type Attestation @entity {
   " Unique ID of the Attestation "
   id: Bytes!
 
-  "// The recipient of the attestation. "
-  recipient: Bytes!
+  " Schema ID"
+  schema: Bytes!
 
-  "// The time when the attestation expires (Unix timestamp). "
+  " The time when the attestation was created (Unix timestamp) "
+  time: BigInt!
+
+  " The time when the attestation expires (Unix timestamp) "
   expirationTime: BigInt!
 
-  " // Whether the attestation is revocable. "
-  revocable: Boolean!
+  " The time when the attestation was revoked (Unix timestamp)"
+  revocationTime: BigInt!
 
-  "// The UID of the related attestation. "
+  " The UID of the related attestation "
   refUID: Bytes!
 
-  "// Custom attestation data. "
-  data: Bytes!
+  " The recipient of the attestation "
+  recipient: Bytes!
 
-  "// An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors. "
-  value: BigInt!
+  " The attester/sender of the attestation "
+  attester: Bytes!
+
+  "  Whether the attestation is revocable "
+  revocable: Boolean!
+
+  " Custom attestation data"
+  data: Bytes!
+}
+
+type ResourceContent @entity {
+  " Unique ID of Content - Attestation UID "
+  id: Bytes!
+
+  " Name of the resource "
+  name: String!
+
+  " Resource content e.g URL, text, etc."
+  content: String!
+
+  " Content hash "
+  contentHash: Bytes!
+
+  " Type of content "
+  type: BigInt!
+
+  " Count of attestations when this resource has been reported as scam "
+  reportedCount: BigInt!
 }
