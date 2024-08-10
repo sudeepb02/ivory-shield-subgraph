@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0x4200000000000000000000000000000000000021"
       abi: EAS
-      startBlock: 5252830
+      startBlock: 13731000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -33,7 +33,7 @@ dataSources:
     source:
       address: "0x4200000000000000000000000000000000000020"
       abi: SchemaRegistry
-      startBlock: 5252696
+      startBlock: 13686000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

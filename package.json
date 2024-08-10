@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --studio ivory-shield",
+    "deploy-version": "dotenv -- sh -c 'graph deploy --studio ivory-shield --version-label $VERSION'",
     "create-local": "graph create --node http://localhost:8020/ ivory-shield",
     "remove-local": "graph remove --node http://localhost:8020/ ivory-shield",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ivory-shield",
@@ -15,6 +16,7 @@
     "@graphprotocol/graph-ts": "0.32.0"
   },
   "devDependencies": {
-    "matchstick-as": "0.5.0"
+    "matchstick-as": "0.5.0",
+    "dotenv-cli": "^7.4.2"
   }
 }
