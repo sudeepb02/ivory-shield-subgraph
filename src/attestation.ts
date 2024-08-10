@@ -47,16 +47,16 @@ export function getOrCreateResourceContent(
   attestationUid: Bytes,
   data: Bytes
 ): ResourceContent {
-  // Reformat data for decoding
-  const formattedData = prepareDataForDecoding(data);
-
-  const decodedData = ethereum.decode(
-    "(string,string,bytes32,uint8)",
-    formattedData
-  );
-
   let resource = ResourceContent.load(attestationUid);
+
   if (!resource) {
+    // Reformat data for decoding
+    const formattedData = prepareDataForDecoding(data);
+
+    const decodedData = ethereum.decode(
+      "(string,string,bytes32,uint8)",
+      formattedData
+    );
     resource = new ResourceContent(attestationUid);
 
     // Populate Decoded data
@@ -77,21 +77,23 @@ export function getOrCreateResourceContent(
       resource.isScamCount = BIGINT_ZERO;
       resource.notScamCount = BIGINT_ZERO;
     }
+    resource.save();
   }
-  resource.save();
   return resource;
 }
 
 // Function to get or create a Vote Content entity from attestation data
 export function getOrCreateVoteContent(
   attestationUid: Bytes,
-  resourceId: Bytes,
   data: Bytes
 ): VoteContent {
   // Reformat data for decoding
   const formattedData = prepareDataForDecoding(data);
 
-  const decodedData = ethereum.decode("(bool,string,string)", formattedData);
+  const decodedData = ethereum.decode(
+    "(bytes,bool,string,string)",
+    formattedData
+  );
 
   let vote = VoteContent.load(attestationUid);
   if (!vote) {
@@ -101,17 +103,17 @@ export function getOrCreateVoteContent(
     if (decodedData) {
       // Convert the decoded values to a Tuple and assign to entity
       const values = decodedData.toTuple();
-      vote.resourceId = resourceId;
-      vote.isScam = values.at(0).toBoolean();
-      vote.reason = values.at(1).toString();
-      vote.info = values.at(2).toString();
+      vote.resourceId = values.at(0).toBytes();
+      vote.isScam = values.at(1).toBoolean();
+      vote.reason = values.at(2).toString();
+      vote.info = values.at(3).toString();
     } else {
       vote.resourceId = BYTES32_ZERO;
       vote.isScam = true;
       vote.reason = "";
       vote.info = "";
     }
+    vote.save();
   }
-  vote.save();
   return vote;
 }

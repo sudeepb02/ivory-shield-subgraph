@@ -2,7 +2,12 @@ import {
   Attested as AttestedEvent,
   Revoked as RevokedEvent,
 } from "../generated/EAS/EAS";
-import { RESOURCE_CONTENT_SCHEMA, VOTE_CONTENT_SCHEMA } from "./constants";
+import {
+  BIGINT_ONE,
+  BYTES32_ZERO,
+  RESOURCE_CONTENT_SCHEMA,
+  VOTE_CONTENT_SCHEMA,
+} from "./constants";
 
 import {
   getOrCreateAttestation,
@@ -36,12 +41,24 @@ export function handleAttested(event: AttestedEvent): void {
     );
   } else if (schemaId.equals(VOTE_CONTENT_SCHEMA)) {
     // Create Vote data from Attestation
-    const resourceId = attestation.refUID;
     const voteContent = getOrCreateVoteContent(
       attestationUid,
-      resourceId,
       attestation.data
     );
+
+    // Pass data as empty as resource should already exist
+    const resourceContent = getOrCreateResourceContent(
+      voteContent.resourceId,
+      BYTES32_ZERO
+    );
+    if (voteContent.isScam) {
+      resourceContent.isScamCount =
+        resourceContent.isScamCount.plus(BIGINT_ONE);
+    } else {
+      resourceContent.notScamCount =
+        resourceContent.notScamCount.plus(BIGINT_ONE);
+    }
+    resourceContent.save();
   }
 }
 

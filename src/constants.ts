@@ -5,7 +5,7 @@ export const RESOURCE_CONTENT_SCHEMA = Bytes.fromHexString(
 );
 
 export const VOTE_CONTENT_SCHEMA = Bytes.fromHexString(
-  "0x1d42f089a296bc14f36c1bad49a74912893d1aeb201dd099914c52a6a6dd5265"
+  "0xd5315809392500715f3506109907ae09ae62e113560b2fa9c7d739752581d6c9"
 );
 
 export const BYTES32_ZERO = Bytes.fromHexString(
