@@ -9,7 +9,7 @@ export function prepareDataForDecoding(attestationData: Bytes): Bytes {
   if (data.startsWith("0x")) {
     data = data.slice(2);
   }
-  
+
   const hexStringToDecode =
     "0000000000000000000000000000000000000000000000000000000000000020".concat(
       data
