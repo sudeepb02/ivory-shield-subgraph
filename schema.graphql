@@ -61,12 +61,18 @@ type ResourceContent @entity {
   type: BigInt!
 
   " Count of attestations when this resource has been reported as scam "
-  reportedCount: BigInt!
+  isScamCount: BigInt!
+
+  " Count of attestations when this resource has been reported as NOT scam "
+  notScamCount: BigInt!
 }
 
 type VoteContent @entity {
   " Unique ID of Vote - Attestation UID "
   id: Bytes!
+
+  " Reference attestation - Resource that is being voted for "
+  resourceId: Bytes!
 
   " Vote for a resource if it is scam or not "
   isScam: Boolean!

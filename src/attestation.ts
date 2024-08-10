@@ -1,6 +1,6 @@
 import { Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { Attested as AttestedEvent, EAS } from "../generated/EAS/EAS";
-import { Attestation, ResourceContent } from "../generated/schema";
+import { Attestation, ResourceContent, VoteContent } from "../generated/schema";
 import { BIGINT_ZERO, BYTES32_ZERO } from "./constants";
 import { prepareDataForDecoding } from "./utils";
 
@@ -67,16 +67,51 @@ export function getOrCreateResourceContent(
       resource.content = values.at(1).toString();
       resource.contentHash = values.at(2).toBytes();
       resource.type = values.at(3).toBigInt();
-      resource.reportedCount = BIGINT_ZERO;
-      resource.save();
+      resource.isScamCount = BIGINT_ZERO;
+      resource.notScamCount = BIGINT_ZERO;
     } else {
       resource.name = "";
       resource.content = "";
       resource.contentHash = BYTES32_ZERO;
       resource.type = BIGINT_ZERO;
-      resource.reportedCount = BIGINT_ZERO;
-      resource.save();
+      resource.isScamCount = BIGINT_ZERO;
+      resource.notScamCount = BIGINT_ZERO;
     }
   }
+  resource.save();
   return resource;
+}
+
+// Function to get or create a Vote Content entity from attestation data
+export function getOrCreateVoteContent(
+  attestationUid: Bytes,
+  resourceId: Bytes,
+  data: Bytes
+): VoteContent {
+  // Reformat data for decoding
+  const formattedData = prepareDataForDecoding(data);
+
+  const decodedData = ethereum.decode("(bool,string,string)", formattedData);
+
+  let vote = VoteContent.load(attestationUid);
+  if (!vote) {
+    vote = new VoteContent(attestationUid);
+
+    // Populate Decoded data
+    if (decodedData) {
+      // Convert the decoded values to a Tuple and assign to entity
+      const values = decodedData.toTuple();
+      vote.resourceId = resourceId;
+      vote.isScam = values.at(0).toBoolean();
+      vote.reason = values.at(1).toString();
+      vote.info = values.at(2).toString();
+    } else {
+      vote.resourceId = BYTES32_ZERO;
+      vote.isScam = true;
+      vote.reason = "";
+      vote.info = "";
+    }
+  }
+  vote.save();
+  return vote;
 }

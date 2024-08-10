@@ -7,6 +7,7 @@ import { RESOURCE_CONTENT_SCHEMA, VOTE_CONTENT_SCHEMA } from "./constants";
 import {
   getOrCreateAttestation,
   getOrCreateResourceContent,
+  getOrCreateVoteContent,
 } from "./attestation";
 
 // Attested event handler - executed when the Attested event is emitted from smart contract
@@ -16,7 +17,7 @@ export function handleAttested(event: AttestedEvent): void {
 
   // Create an attestation with onchain data only for current app specific schemas
   if (
-    schemaId.notEqual(RESOURCE_CONTENT_SCHEMA) ||
+    schemaId.notEqual(RESOURCE_CONTENT_SCHEMA) &&
     schemaId.notEqual(VOTE_CONTENT_SCHEMA)
   ) {
     return;
@@ -35,6 +36,12 @@ export function handleAttested(event: AttestedEvent): void {
     );
   } else if (schemaId.equals(VOTE_CONTENT_SCHEMA)) {
     // Create Vote data from Attestation
+    const resourceId = attestation.refUID;
+    const voteContent = getOrCreateVoteContent(
+      attestationUid,
+      resourceId,
+      attestation.data
+    );
   }
 }
 
