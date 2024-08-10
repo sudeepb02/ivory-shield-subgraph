@@ -13,6 +13,8 @@ import {
 } from "./constants";
 import { log } from "matchstick-as";
 
+import { prepareDataForDecoding } from "./utils";
+
 export function handleAttested(event: AttestedEvent): void {
   const attestationUid = event.params.uid;
   const schemaId = event.params.schemaUID;
@@ -75,25 +77,12 @@ export function getOrCreateResourceContent(
   attestationUid: Bytes,
   data: Bytes
 ): ResourceContent {
-  // log.warning("Data from event {}", [data.toHexString()]);
-  // const hardcodedData =
-  //   "0x000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c010374164a3cfb2c4b26b427feb2087dc7df37f0a9afd7f56ac82e2e1db8c82e1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000104368617447505420426f74205363616d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b68747470733a2f2f7777772e796f75747562652e636f6d2f77617463683f763d5f432d7a7a6b3274567030000000000000000000000000000000000000000000";
-  // log.warning("hardcodedData {}", [hardcodedData]);
-
-  // // const tempData = Bytes.fromHexString(
-  // //   "0x0000000000000000000000000000000000000000000000000000000000000020"
-  // // ).concat(data);
-  // const hexStringToDecode =
-  //   "0x0000000000000000000000000000000000000000000000000000000000000020" +
-  //   hardcodedData; // prepend tuple offset
-  // const tempData = Bytes.fromByteArray(Bytes.fromHexString(hexStringToDecode));
-  const tempData = Bytes.fromHexString(
-    "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c010374164a3cfb2c4b26b427feb2087dc7df37f0a9afd7f56ac82e2e1db8c82e1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000104368617447505420426f74205363616d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b68747470733a2f2f7777772e796f75747562652e636f6d2f77617463683f763d5f432d7a7a6b3274567030000000000000000000000000000000000000000000"
-  );
+  // Reformat data for decoding
+  const formattedData = prepareDataForDecoding(data);
 
   const decodedData = ethereum.decode(
     "(string,string,bytes32,uint8)",
-    tempData
+    formattedData
   );
 
   let resource = ResourceContent.load(attestationUid);
@@ -102,19 +91,12 @@ export function getOrCreateResourceContent(
 
     // Populate Decoded data
     if (decodedData) {
-      log.warning("Decoded data kind {}", [decodedData.kind.toString()]); //Kind is Uint value 4
-      log.warning("Decoded data value {}", [decodedData.data.toString()]); //Kind is Uint value 4
-
+      // Convert the decoded values to a Tuple and assign to entity
       const values = decodedData.toTuple();
-      log.warning("Value 0: {}", [values.at(0).toString()]);
-      log.warning("Value 1: {}", [values.at(1).toString()]);
-
       resource.name = values.at(0).toString();
       resource.content = values.at(1).toString();
-      // resource.name = "A";
-      // resource.content = "BCDE";
-      resource.contentHash = BYTES32_ZERO;
-      resource.type = BIGINT_ZERO;
+      resource.contentHash = values.at(2).toBytes();
+      resource.type = values.at(3).toBigInt();
       resource.reportedCount = BIGINT_ZERO;
       resource.save();
     } else {
@@ -126,6 +108,5 @@ export function getOrCreateResourceContent(
       resource.save();
     }
   }
-
   return resource;
 }
